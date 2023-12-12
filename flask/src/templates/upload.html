@@ -1,69 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Upload A file</title>
-    </head>
-    <body>
-        <header>
-            <a href="https://github.com/cs298-398f23/file-fortress">GitHub Repo</a>
-            <a href="logout">Logout</a>
-        </header>
-        <form id="fileUploadForm" enctype="multipart/form-data">
-            <label for="shortLink">Short Link:</label>
-            <input type="text" name="shortLink" id="shortLink" required>
-            <br>
-            <label for="fileInput">Choose a file:</label>
-            <input type="file" name="file" id="fileInput" required>
-            <br>
-            <input type="submit" value="Upload File">
-            <!-- Display success or error messages to the user -->
-            <div id="message"></div>
-        </form>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload A file</title>
+    <style>
+      form.upload#fileUploadForm {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      form.upload#fileUploadForm > label {
+        text-align: left;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a href="https://github.com/cs298-398f23/file-fortress">GitHub Repo</a>
+      <a href="logout">Logout</a>
+    </header>
+    <form class="upload" id="fileUploadForm" enctype="multipart/form-data">
+      <label for="shortLink">Short Link:</label>
+      <input
+        type="text"
+        name="shortLink"
+        id="shortLink"
+        placeholder="Short Link"
+      />
+      <br />
+      <label for="fileInput">Choose a file:</label>
+      <input type="file" name="file" id="fileInput" required />
+      <br />
+      <input type="submit" value="Upload File" />
+      <!-- Display success or error messages to the user -->
+      <div id="preview"></div>
+      <div id="message"></div>
+    </form>
 
-        <script>
-            document.getElementById('fileUploadForm').addEventListener('submit', function(event) {
-                event.preventDefault();
-                uploadFile();
-            });
+    <script>
+      document
+        .getElementById("fileUploadForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          uploadFile();
+        });
 
-            function uploadFile() {
-                const shortLinkInput = document.getElementById('shortLink');
-                const shortLink = shortLinkInput.value.trim();
-                const fileInput = document.getElementById('fileInput');
-                const file = fileInput.files[0];
-                const messageDiv = document.getElementById('message');
+      function uploadFile() {
+        const shortLinkInput = document.getElementById("shortLink");
+        const shortLink = shortLinkInput.value.trim();
+        const fileInput = document.getElementById("fileInput");
+        const file = fileInput.files[0];
+        const messageDiv = document.getElementById("message");
 
-                if (!shortLink || !file) {
-                    messageDiv.innerHTML = '<p>Please enter a short link and choose a file.</p>';
-                    return;
-                }
+        if (!file) {
+          messageDiv.innerHTML = "<p>Please select a file.</p>";
+          return;
+        }
 
-                const formData = new FormData();
-                formData.append('file', file);
+        const formData = new FormData();
+        formData.append("file", file);
 
-                fetch(`/api/v1/file/${shortLink}`, {
-                    method: 'POST',
-                    body: formData,
-                })
-                    .then(response => {
-                        if (response.ok) {
-                            messageDiv.innerHTML = '<p>File uploaded successfully!</p>';
-                            return response.json();
-                        } else {
-                            throw new Error('File upload failed');
-                        }
-                    })
-                    .then(data => {
-                        console.log(data);  // Handle the success response if needed
-                    })
-                    .catch(error => {
-                        console.error(error);  // Handle the error
-                        messageDiv.innerHTML = '<p>File upload failed. Please try again.</p>';
-                    });
+        fetch(`/api/v1/file${shortLink ? `/${shortLink}` : ""}`, {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => {
+            if (response.ok) {
+              messageDiv.innerHTML = "<p>File uploaded successfully!</p>";
+              return response.json();
+            } else {
+              throw new Error("File upload failed");
             }
-        </script>
-    </body>
+          })
+          .then((data) => {
+            console.log(data); // Handle the success response if needed
+            messageDiv.innerHTML = `<p>File uploaded successfully! Short link: <a href=http://${window.location.host}/${data.link}>${window.location.host}/${data.link}</a></p>`;
+          })
+          .catch((error) => {
+            console.error(error); // Handle the error
+            messageDiv.innerHTML =
+              "<p>File upload failed. Please try again.</p>";
+          });
+      }
+    </script>
+  </body>
 </html>
-
