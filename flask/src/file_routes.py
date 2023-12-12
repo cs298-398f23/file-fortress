@@ -42,7 +42,7 @@ def file(short_link):
 @file_api.route('/api/v1/file', methods=['POST'], provide_automatic_options=False)
 @file_api.route('/api/v1/file/<short_link>', methods=['POST'],
                 provide_automatic_options=False)
-def upload_file(short_link):
+def upload_file(short_link=None):
     if 'file' not in request.files:
         return jsonify({'error': 'no file provided'}), 400
 
@@ -57,7 +57,7 @@ def upload_file(short_link):
     manager = current_app.config['STORAGE_MANAGER']
 
     if short_link is None:
-        short_link = manager.generate_short_link()
+        short_link = manager.generate_short_link(str(manager._system_id))
 
     filename = file.filename
     file_info = {
