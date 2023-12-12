@@ -84,7 +84,7 @@ def upload_file(short_link=None):
     # save file
     manager.push_file(file.stream, file_info['url'])
 
-    return jsonify({'success': 'file uploaded succesfully'}), 200
+    return jsonify({'success': 'file uploaded succesfully', "link": short_link}), 200
 
 
 @file_api.route('/api/v1/file/<short_link>', methods=['OPTIONS'],
