@@ -65,7 +65,7 @@ def test_upload_file(client, tmpdir):
     )
 
     assert response.status_code == 200
-    assert response.json == {"success": "file uploaded succesfully"}
+    assert response.json == {'link': 'test', "success": "file uploaded succesfully"}
     # this part is annoying, it hurts me
     os.remove('0/test.txt')
     os.rmdir('0')
